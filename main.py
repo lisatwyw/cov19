@@ -1,5 +1,11 @@
-import torch
+
+# Adopted from 
+# https://github.com/munniomer/pytorch-tutorials/blob/master/beginner_source/finetuning_torchvision_models_tutorial.py
+#    
+#
+
 SEED=101
+import torch
 torch.manual_seed(SEED)
 
 import torch.nn as nn
@@ -481,7 +487,7 @@ if tk:
     print( conf_v )
     
     Results[ PATH ]= [f1t, f1v] 
-    Results[ PATH ]= [conf_t, conf_v] 
+    Results2[ PATH ]= [conf_t, conf_v] 
     
       
 
