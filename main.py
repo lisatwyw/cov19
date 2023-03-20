@@ -31,15 +31,20 @@ from torch.utils.data import Dataset, DataLoader
 
 num_classes = 4
 
+if ( 'Results' in globals())==False:
+    Results={}
+    Results2={}
+    
 if ( 'MID' in globals())==False:
     # Models to choose from [resnet, alexnet, vgg, squeezenet, densenet, inception]
     MID='inception' 
+        
 if ( 'BS' in globals())==False:
     BS = 16
 if ( 'EP' in globals())==False:        
     EP = 200
-if ( 'LOAD_RAM' in globals())==False:        
-    LOAD_RAM = 1
+if ( 'PRELOAD' in globals())==False:        
+    PRELOAD = 1
     # exec( open('extract_and_store_slices.py').read()  )
 
 # Flag for feature extracting. When False, we finetune the whole model,
@@ -130,7 +135,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
 model, input_size, is_inception = initialize_model( MID, num_classes, feature_extract, use_pretrained=True)
 
 
-PATH = '/home/lisat/scratch/mdls/severity_more4_%s_BS%d' % (MID,BS)
+PATH = '~/scratch/mdls/severity_more4_%s_BS%d' % (MID,BS)
 print( '\n\n\nWriting results to', PATH , '\n\n' ) 
 
 class CTDataset_in_ram( Dataset ):
@@ -189,46 +194,45 @@ class CTDataset_in_ram( Dataset ):
  
 from torch.utils.data import DataLoader
 
-    if LOAD_RAM:        
-        all_scans = {}
-        all_scan_nums = {}
-        
-        for tid in tids:
-            d=np.load('all2_%d_%s_mid.npy.npz'%(input_size,tid ))
-            all_scans[tid]=d['a']
-            all_scan_nums[tid]=d['b']        
-        
-        ds = {}
-        
-        duplicate_cate4 = trn_partition.loc[  trn_partition.Category == 4, :]
-        
-        list_trn = list( duplicate_cate4.Name.values ) + list( trn_partition.Name.values ) 
-        list_trn = list( trn_partition.Name.values ) 
-        list_val = list( val_partition.Name.values ) 
-        
-        #all_scans, TID, csv_file, dataframe=None, debug=False
-        ds['train'] = CTDataset_in_ram( all_scans=all_scans, csv_file=list_trn, dataframe=trn_partition, debug=True, TID = 'train' )
-        ds['val']   = CTDataset_in_ram( all_scans=all_scans, csv_file=list_val, dataframe=val_partition, debug=True, TID = 'val' )
-        fff ='/home/lisat/scratch/severity_test.csv'
-        
-        list_tst=pd.read_csv( fff ).values               
-        ds['test']   = CTDataset_in_ram( all_scans=all_scans, csv_file=list_val, dataframe=None, debug=True, TID = 'test' )
-        
-        print('Sanity checks')
-        for tid in tids:
-            print(all_scans[tid].sum())
-            
+if PRELOAD:        
+    all_scans = {}
+    all_scan_nums = {}
+
+    for tid in tids:
+        d=np.load('~/scratch/all3_%d_%s_mid.npy.npz'%(input_size,tid ))
+        all_scans[tid]=d['a']
+        all_scan_nums[tid]=d['b']        
+
+    ds = {}
+
+    duplicate_cate4 = trn_partition.loc[  trn_partition.Category == 4, :]
+
+    list_trn = list( duplicate_cate4.Name.values ) + list( trn_partition.Name.values ) 
+    list_trn = list( trn_partition.Name.values ) 
+    list_val = list( val_partition.Name.values ) 
+
+    #all_scans, TID, csv_file, dataframe=None, debug=False
+    ds['train'] = CTDataset_in_ram( all_scans=all_scans, csv_file=list_trn, dataframe=trn_partition, debug=True, TID = 'train' )
+    ds['val']   = CTDataset_in_ram( all_scans=all_scans, csv_file=list_val, dataframe=val_partition, debug=True, TID = 'val' )
+    
+    fff ='~scratch/severity_test.csv' # 101 files only (upload not done properly)    
+    fff ='~scratch/test/test_mar19.csv' # entire list per email
+
+    list_tst=pd.read_csv( fff ).values               
+    ds['test'] = CTDataset_in_ram( all_scans=all_scans, csv_file=list_val, dataframe=None, debug=True, TID = 'test' )
+
+    print('Sanity checks')
+    for tid in tids:
+        print(all_scans[tid].sum())
+
                        
 # Create training and validation dataloaders
 dataloaders = {x: torch.utils.data.DataLoader( ds[x], batch_size=BS, shuffle=True) for x in ['train', 'val', 'test']}
-
-
 
 ds['train'].debug = ds['val'].debug = True 
 for phase in tids:
     next(iter( dataloaders[phase] ))            
 ds['train'].debug = ds['val'].debug = False
-
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
@@ -263,6 +267,7 @@ val_acc_history = []
 best_model_wts = copy.deepcopy(model.state_dict())
 best_acc = 0.0
 
+# option #1
 def early_stopping(train_loss, validation_loss, min_delta, tolerance):
     # https://stackoverflow.com/questions/71998978/early-stopping-in-pytorch
     counter = 0
@@ -270,6 +275,8 @@ def early_stopping(train_loss, validation_loss, min_delta, tolerance):
         counter +=1
         if counter >= tolerance:
             return True
+       
+# option #2    
 class EarlyStopper:
     def __init__(self, patience=1, min_delta=0):
         self.patience = patience
@@ -323,8 +330,8 @@ for MODE in TK:
                     #    break 
                     # inputs, labels = next(iter( dataloaders[phase] ))            
 
-                    inputs = inputs.to(device) # BS * 3 * input_size * input_size                   
-                    labels = labels.to(device) # BS * num_class                   
+                    inputs = inputs.to(device) # BS x 3 x input_size x input_size                   
+                    labels = labels.to(device) # BS x num_class                   
 
                     optimizer.zero_grad()
 
@@ -336,7 +343,7 @@ for MODE in TK:
                             # From https://discuss.pytorch.org/t/how-to-optimize-inception-model-with-auxiliary-classifiers/7958
                             outputs, aux_outputs = model(inputs)
 
-                            # BS x 4 classes, BS x 4 classes,  labels                              
+                            # BS x4 classes, BS x 4 classes...                              
                             # print( outputs.shape, aux_outputs.shape, labels.shape ) 
                             loss1 = criterion(outputs, labels)
                             loss2 = criterion(aux_outputs, labels)
@@ -388,8 +395,7 @@ for MODE in TK:
                 else:
                     trn_loss.append( ls )
 
-            if early_stopper.early_stop(val_loss[-1] ):                         
-                #if early_stopping(epoch_train_loss, epoch_validate_loss)
+            if early_stopper.early_stop(val_loss[-1] ):  # early_stopping(epoch_train_loss, epoch_validate_loss)
                 break
             elif epoch >early_stopper.patience:
                 print( early_stopper.counter, early_stopper.patience, 'last 3 validation losses', val_loss[-3:]  )
@@ -401,16 +407,12 @@ for MODE in TK:
 
         # load best model weights
         model.load_state_dict(best_model_wts)                
-
         
         plt.close('all'); 
-        plt.plot( trn_loss, label ='trn' )
-        plt.plot( val_loss ,label='val')        
+        plt.plot( trn_loss, label='trn' )
+        plt.plot( val_loss ,label='val' )        
         plt.legend()
-        plt.savefig( '%s_progress.png'%PATH )
-
-
-        
+        plt.savefig( '%s_progress.png'%PATH )       
         
     elif MODE==3:                             
         
@@ -431,8 +433,7 @@ if tk:
     
     Pred={}    
     Actual={}
-    
-     
+         
     for phase in tids:   
 
         Pred[phase]=[]
@@ -446,10 +447,9 @@ if tk:
         else:
             print('\n\nscan_id, predicted_category' )
             
-
         for inputs, labels in dataloaders[phase]: 
 
-            batch_count+=1
+            batch_count+=1            
             # ds[phase].scan_nums = []        
 
             inputs = inputs.to(device)
@@ -458,9 +458,8 @@ if tk:
             preds = preds.cpu().numpy()
 
             tt = torch.max(labels,1)[1].numpy()
-            for i,p in enumerate( preds ):
-
-          
+            
+            for i,p in enumerate( preds ):          
                 j=i + BS*(batch_count) 
                 sid=ds[phase].scan_nums[ j ]
 
@@ -493,3 +492,22 @@ if tk:
 
     
 
+'''
+--------------------
+~/scratch/mdls2/severity_all2_resnet152_BS128_adam_LR0.008 
+--------------------
+trainF1-macro=1.000 
+
+[[132   0   0   0]
+ [  0 123   0   0]
+ [  0   0 166   0]
+ [  0   0   0  39]]
+
+
+ valF1-macro=0.912 
+
+[[29  0  2  0]
+ [ 0 20  0  0]
+ [ 1  0 44  0]
+ [ 0  0  2  3]]
+'''
