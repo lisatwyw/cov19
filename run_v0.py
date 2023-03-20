@@ -135,7 +135,7 @@ def initialize_model(model_name, num_classes, feature_extract, use_pretrained=Tr
 model, input_size, is_inception = initialize_model( MID, num_classes, feature_extract, use_pretrained=True)
 
 
-PATH = '~/scratch/mdls/severity_more4_%s_BS%d' % (MID,BS)
+PATH = '~/scratch/mdls/severity_all2_%s_BS%d' % (MID,BS)
 print( '\n\n\nWriting results to', PATH , '\n\n' ) 
 
 class CTDataset_in_ram( Dataset ):
@@ -199,7 +199,7 @@ if PRELOAD:
     all_scan_nums = {}
 
     for tid in tids:
-        d=np.load('~/scratch/all3_%d_%s_mid.npy.npz'%(input_size,tid ))
+        d=np.load('~/scratch/all2_%d_%s_mid.npy.npz'%(input_size,tid ))
         all_scans[tid]=d['a']
         all_scan_nums[tid]=d['b']        
 
@@ -216,7 +216,7 @@ if PRELOAD:
     ds['val']   = CTDataset_in_ram( all_scans=all_scans, csv_file=list_val, dataframe=val_partition, debug=True, TID = 'val' )
     
     fff ='~scratch/severity_test.csv' # 101 files only (upload not done properly)    
-    fff ='~scratch/test/test_mar19.csv' # entire list per email
+    fff ='~scratch/test/test_mar19.csv' # entire list per email on 2023-03-19
 
     list_tst=pd.read_csv( fff ).values               
     ds['test'] = CTDataset_in_ram( all_scans=all_scans, csv_file=list_val, dataframe=None, debug=True, TID = 'test' )
