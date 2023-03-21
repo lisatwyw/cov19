@@ -6,9 +6,9 @@ Summary:
 
 |Diagnosis| Subset| n | Count per severity class |
 |:--|:--|:--|:--|
-|noncovid| train  | N/A |
+|noncovid| train  | | N/A |
 | | val | |   N/A |
 | | test | | N/A |
-|covid| train | | |
-| | val | | | 
-| | test | | |
+|covid| train | 460 | 132, 123, 166, 39 |
+| | val | 101 | 31, 20, 45, 5 | 
+| | test | 231 | N/A |
