@@ -1,6 +1,11 @@
 # Classification of disease severity using the COV19-CT-DS
 
-## [Data folders and file counts](https://docs.google.com/spreadsheets/d/1SoVfioBKj_ElEETEk7o7KK_vs6VEca8LLIYW0xXpSYY/)
+## Resources
+https://www.eibir.org/covid-19-imaging-datasets/
+
+## COV19-CT-DB
+
+### [Data folders and file counts](https://docs.google.com/spreadsheets/d/1SoVfioBKj_ElEETEk7o7KK_vs6VEca8LLIYW0xXpSYY/)
 
 Summary:
 
