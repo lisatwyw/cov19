@@ -24,5 +24,5 @@ Summary:
 - https://www.kaggle.com/code/utkarshsaxenadn/ct-scans-3d-data-3d-data-processing-3d-cnn#3D-Scans-Data-Loading
 
 ### Lung mask segmentation code
-https://github.com/pzaffino/COVID19-intensity-labeling/blob/main/lungs_processing.py  
-   
+https://github.com/pzaffino/COVID19-intensity-labeling/blob/main/lungs_processing.py    
+- uses Simple ITK
