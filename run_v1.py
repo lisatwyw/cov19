@@ -225,8 +225,6 @@ if 1:
             self.descriptions = []
                         
             self.scan_nums=[]                
-            #self.resz_flip = transforms.Compose([transforms.ToTensor(), transforms.Resize(input_size), transforms.RandomHorizontalFlip(p=0) ])                
-            #self.resz      = transforms.Compose([transforms.ToTensor(), transforms.Resize(input_size), ])                
                 
             assert len(all_scans) == len(csv_file)                       
             
@@ -291,33 +289,24 @@ if 1:
         list_val2= list( val_partition.Name.values ) 
         
         
-ds['train'] = CTDataset_in_ram( all_scans = all_scans['train'][trn_inds, ], csv_file = list_trn, dataframe=trn_partition, debug=True, TID = 'train' )
-ds['val']   = CTDataset_in_ram( all_scans = all_scans['train'][val_inds, ], csv_file = list_val, dataframe=trn_partition, debug=True, TID = 'val' )
+ds['train'] = CTDataset_in_ram( all_scans = all_scans['train'][trn_inds, ], csv_file = list_trn, dataframe=trn_partition, debug=False, TID = 'train' )
+ds['val']   = CTDataset_in_ram( all_scans = all_scans['train'][val_inds, ], csv_file = list_val, dataframe=trn_partition, debug=False, TID = 'val' )
 ds['val2']  = CTDataset_in_ram( all_scans=all_scans['val'], csv_file=list_val2, dataframe=val_partition, debug=True, TID = 'val' )
 
-fff ='~scratch/severity_test.csv'
-fff ='~scratch/test/test_mar19.csv' # entire list per email
-list_tst= pd.Series(  pd.read_csv( fff, header = None )[0].values ).tolist()      
+filename ='~/scratch/severity_test.csv' # partial list used before email (list got created before all uploading was done)
+filename ='~/scratch/test/test_mar19.csv' # entire list per email
+list_tst= pd.Series(  pd.read_csv( filename, header = None )[0].values ).tolist()      
 print( 'train:', len(trn_inds), 'train2',  len(val_inds), len(list_tst), 'test')
-ds['test']   = CTDataset_in_ram( all_scans=all_scans['test'], csv_file=list_tst, dataframe=None, debug=True, TID = 'test' )
+ds['test']  = CTDataset_in_ram( all_scans=all_scans['test'], csv_file=list_tst, dataframe=None, debug=True, TID = 'test' )
 
 for tid in tids:
-    #print( 'check for empty slice', np.where( np.sum(np.sum(np.sum(all_scans[tid][],2),1),1)), all_scans[tid].shape )          
     print( 'check for empty slice', np.sum(np.sum(np.sum(all_scans[tid],2),1),1) ); 
     print( np.where( np.sum(np.sum(np.sum(all_scans[tid],2),1),1)  ==0) )
             
 # Create training and validation dataloaders
 dataloaders = {x: torch.utils.data.DataLoader( ds[x], batch_size=BS, shuffle=True) for x in ['train', 'val']}
-
 dataloaders['val2'] = torch.utils.data.DataLoader( ds['val2'], batch_size=1, shuffle=False)
 dataloaders['test'] = torch.utils.data.DataLoader( ds['test'], batch_size=1, shuffle=False)
-
-if 0:
-    ds['train'].debug = ds['val'].debug = True 
-    phase='val2'
-    for a in dataloaders[phase]:
-        print('.') # sanity check          
-    ds['train'].debug = ds['val'].debug = False
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
@@ -343,7 +332,7 @@ if OP=='SGD':
 else:
     optimizer = optim.Adam(params_to_update, lr=LR )    
      
-PATH = '~scratch/mdls_sep/severity_%s_%s_BS%d_%s_LR%.3f' % (IMGSET, MID, BS, OP, LR)
+PATH = '~s/cratch/mdls_sep/severity_%s_%s_BS%d_%s_LR%.3f' % (IMGSET, MID, BS, OP, LR)
 print( '\n\n\nWriting results to', PATH , '\n\n' ) 
 
 # Setup the loss f x n
@@ -378,12 +367,6 @@ class EarlyStopper:
                 return True
         return False
 
-def eval( tstloader ):
-    L=[]
-    for inputs, labels in tstloader:
-        L.append()
-    return L 
-        
 if tk==1:
     TK = [1,2]
 else:
