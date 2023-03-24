@@ -16,6 +16,25 @@ Summary:
 | | test | 231 | N/A |
 
 
+## Reproducing results
+
+```
+$ ipython
+
+
+In [1]: BS=128; IMGSET='all2'; MID='wideres101'; exec( open('icassp_sep.py').read() )
+```
+
+```
+python icassp_sep.py 1 0 16   
+
+# MID=1
+#
+# FT=0 # FT=0 : Fine tune the last layer only
+#      # FT=1 : Fine tune all layers
+#
+# BS=16 
+```            
 
 ## Other resources
 
