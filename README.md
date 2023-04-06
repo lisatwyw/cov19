@@ -31,7 +31,7 @@ $ ipython
 In [1]: BS=128; IMGSET='all2'; MID='wideres101'; exec( open('icassp_sep.py').read() )
 ```
 
-2b. Run non=interactively
+2b. Run non-interactively
 ```
 $ python icassp_sep.py 1 0 16   
 
