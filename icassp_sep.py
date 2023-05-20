@@ -53,7 +53,7 @@ if ('val_partition' in globals())==False:
     print("PyTorch Version: ",torch.__version__) # 1.13.1 
     print("Torchvision Version: ", torchvision.__version__ )# ptorch-gpu 0.14.1
 
-    val_partition = pd.read_excel( icassp23/ICASSP_severity_validation_partition.xlsx') # engine='openpyxl' )
+    val_partition = pd.read_excel( 'icassp23/ICASSP_severity_validation_partition.xlsx') # engine='openpyxl' )
     trn_partition = pd.read_excel( 'icassp23/ICASSP_severity_train_partition.xlsx' ) # engine='openpyxl' )
     
 num_classes = 4            
