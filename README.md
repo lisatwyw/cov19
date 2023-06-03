@@ -43,6 +43,22 @@ $ python icassp_sep.py 1 0 16
 # BS=16 
 ```            
 
+Thank you for your exploration of this repo and consideration to cite this work:
+```
+Tang LY. Severity classification of ground-glass opacity via 2-D convolutional neural network and lung CT scans: a 3-day exploration. arXiv preprint arXiv:2303.16904. 2023 Mar 23.
+```
+
+```
+@article{tang2023severity,
+  title={Severity classification of ground-glass opacity via 2-D convolutional neural network and lung CT scans: a 3-day exploration},
+  author={Tang, Lisa YW},
+  journal={arXiv preprint arXiv:2303.16904},
+  year={2023}
+}
+```
+
+
+
 ## Other resources
 
 ### Datasets
