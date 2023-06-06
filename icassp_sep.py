@@ -1,5 +1,19 @@
-# cd /home/lisat/scratch/; BS=128;  
+#    Copyright 2023 lisatwyw Lisa Y.W. Tang 
 #
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+
+
+# cd /home/your_userid/scratch/; BS=128;  
 # 
 # IMGSET='all2'; NORM=2; MID='squeezenet'; tk=3; FT=1; exec( open('icassp23/icassp_sep.py').read() )
 #
@@ -218,7 +232,7 @@ if PRELOAD:
 
     for tid in tids:                        
 
-        filename ='/home/lisat/scratch/icassp23/numpy/%s_%d_%s_mid.npy.npz'%( IMGSET, input_size,tid )
+        filename ='/home/your_userid/scratch/icassp23/numpy/%s_%d_%s_mid.npy.npz'%( IMGSET, input_size,tid )
         d=np.load( filename )
         print( '\n\n**********\n', filename )
 
@@ -258,7 +272,7 @@ ds['train'] = CTDataset_in_ram( all_scans = all_scans['train'][trn_inds, ], csv_
 ds['val']   = CTDataset_in_ram( all_scans = all_scans['train'][val_inds, ], csv_file = list_trn_val, dataframe=trn_partition, debug=False, TID = 'val' )
 ds['val2']  = CTDataset_in_ram( all_scans = all_scans['val'],               csv_file = list_val2,    dataframe=val_partition, debug=False, TID = 'val2' )
 
-fff ='/home/lisat/scratch/icassp23/test/test_mar19.csv' # entire list per email
+fff ='/home/your_userid/scratch/icassp23/test/test_mar19.csv' # entire list per email
 
 list_tst= pd.Series( pd.read_csv( fff, header = None )[0].values ).tolist()      
 print( '|train|=', len(trn_inds), '|train2|=',  len(val_inds), '|test|=', len(list_tst))
@@ -587,5 +601,5 @@ if ( 'trn_loss'  in globals() ):
                                  'Results5':Results5, 'Results6':Results6, 'epoch':epoch, 'Actual':Actual, 'Pred':Pred } )    
     del trn_loss
 
-    # write2pkl( '/home/lisat/scratch/actuallabels', {'Actual':Actual})
+    # write2pkl( '/home/your_userid/scratch/actuallabels', {'Actual':Actual})
  
